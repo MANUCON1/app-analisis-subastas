@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+<div class="jumbotron text-center mt-5">
+    <h1 class="display-4">Bienvenido a Mi Aplicación</h1>
+    <p class="lead">Una aplicación web con sistema de autenticación y suscripción.</p>
+    <hr class="my-4">
+    {% if not current_user.is_authenticated %}
+        <p>Por favor inicia sesión o regístrate para acceder a la aplicación.</p>
+        <a class="btn btn-primary btn-lg me-2" href="{{ url_for('register') }}" role="button">Registrarse</a>
+        <a class="btn btn-secondary btn-lg" href="{{ url_for('login') }}" role="button">Iniciar sesión</a>
+    {% else %}
+        <p>Ya has iniciado sesión.</p>
+        <a class="btn btn-primary btn-lg" href="{{ url_for('dashboard') }}" role="button">Ir al Dashboard</a>
+    {% endif %}
+</div>
+{% endblock %}

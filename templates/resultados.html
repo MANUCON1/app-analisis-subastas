@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block title %}Resultados del Análisis - Subastas Visual{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Resultados del Análisis</h2>
+            <p class="text-muted">Creado el: {{ analisis.fecha_creacion.strftime('%d/%m/%Y %H:%M') }}</p>
+            <hr>
+        </div>
+    </div>
+
+    <!-- Resumen de la Subasta -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">📋 Datos de la Subasta</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Identificador:</strong> {{ analisis.identificador or 'N/A' }}</p>
+                    <p><strong>Fecha conclusión:</strong> {{ analisis.fecha_conclusion or 'N/A' }}</p>
+                    <p><strong>Dirección:</strong> {{ analisis.direccion or 'N/A' }}</p>
+                    <p><strong>Ref. Catastral:</strong> {{ analisis.referencia_catastral or 'N/A' }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Valor subasta:</strong> {{ '{:,.2f}'.format(analisis.valor_subasta).replace(',', 'X').replace('.', ',').replace('X', '.') if analisis.valor_subasta else 'N/A' }} €</p>
+                    <p><strong>Tasación:</strong> {{ '{:,.2f}'.format(analisis.tasacion).replace(',', 'X').replace('.', ',').replace('X', '.') if analisis.tasacion else 'N/A' }} €</p>
+                    <p><strong>Depósito:</strong> {{ '{:,.2f}'.format(analisis.deposito).replace(',', 'X').replace('.', ',').replace('X', '.') if analisis.deposito else 'N/A' }} €</p>
+                </div>
+            </div>
+            {% if analisis.url_subasta %}
+            <a href="{{ analisis.url_subasta }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-external-link-alt"></i> Ver en BOE
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Análisis de Puja -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">💰 Análisis de Puja</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <h6>Tu Puja</h6>
+                    <h3 class="text-primary">{{ '{:,.2f}'.format(analisis.puja).replace(',', 'X').replace('.', ',').replace('X', '.') if analisis.puja else 'N/A' }} €</h3>
+                </div>
+                <div class="col-md-4">
+                    <h6>Porcentaje sobre Valor</h6>
+                    <h3>{{ '{:.2f}'.format(analisis.porcentaje_puja).replace('.', ',') if analisis.porcentaje_puja else 'N/A' }} %</h3>
+                </div>
+                <div class="col-md-4">
+                    <h6>Veredicto</h6>
+                    {% if analisis.veredicto == 'ADJUDICADO' %}
+                        <h3><span class="badge badge-success badge-lg">{{ analisis.veredicto }}</span></h3>
+                    {% elif analisis.veredicto == 'POSIBLEMENTE' %}
+                        <h3><span class="badge badge-warning badge-lg">{{ analisis.veredicto }}</span></h3>
+                    {% else %}
+                        <h3><span class="badge badge-danger badge-lg">{{ analisis.veredicto or 'N/A' }}</span></h3>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inversión Total -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">📊 Desglose de Inversión</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Concepto</th>
+                        <th class="text-right">Importe</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Puja</td>
+                        <td class="text-right">{{ '{:,.2f}'.format(analisis.puja).replace(',', 'X').replace('.', ',').replace('X', '.') if analisis.puja else '0,00' }} €</td>
+                    </tr>
+                    <tr>
+                        <td>ITP ({{ analisis.itp_porcentaje or 7 }}%)</td>
+                        <td class="text-right">{{ '{:,.2f}'.format(analisis.itp_calculado).replace(',', 'X').replace('.', ',').replace('X', '.') if analisis.itp_calculado else '0,00' }} €</td>
+                    </tr>
+                    <tr>
+                        <td>Notaría y Registro</td>
+                        <td class="text-right">{{ '{:,.2f}'.format(analisis.notaria_registro).replace(',', 'X').replace('.', ',').replace('X', '.') if analisis.notaria_registro else '0,00' }} €</td>
+                    </tr>
+                    <tr>
+                        <td>IBI Judicial ({{ analisis.anos_total or 0 }} años)</td>
+                        <td class="text-right">{{ '{:,.2f}'.format(analisis.ibi_total).replace(',', 'X').replace('.', ',').replace('X', '.') if analisis.ibi_total else '0,00' }} €</td>
+                    </tr>
+                    <tr>
+                        <td>Comunidad Judicial</td>
+                        <td class="text-right">{{ '{:,.2f}'.format(analisis.comunidad_total).replace(',', 'X').replace('.', ',').replace('X', '.') if analisis.comunidad_total else '0,00' }} €</td>
+                    </tr>
+                    <tr>
+                        <td>Alarmas</td>
+                        <td class="text-right">{{ '{:,.2f}'.format(analisis.alarmas).replace(',', 'X').replace('.', ',').replace('X', '.') if analisis.alarmas else '0,00' }} €</td>
+                    </tr>
+                    <tr>
+                        <td>Suministros</td>
+                        <td class="text-right">{{ '{:,.2f}'.format(analisis.suministros).replace(',', 'X').replace('.', ',').replace('X', '.') if analisis.suministros else '0,00' }} €</td>
+                    </tr>
+                    <tr>
+                        <td>Reforma</td>
+                        <td class="text-right">{{ '{:,.2f}'.format(analisis.reforma).replace(',', 'X').replace('.', ',').replace('X', '.') if analisis.reforma else '0,00' }} €</td>
+                    </tr>
+                </tbody>
+                <tfoot class="table-primary">
+                    <tr>
+                        <th>TOTAL INVERSIÓN</th>
+                        <th class="text-right">{{ '{:,.2f}'.format(analisis.total_inversion).replace(',', 'X').replace('.', ',').replace('X', '.') if analisis.total_inversion else '0,00' }} €</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <!-- Análisis de Rentabilidad -->
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">📈 Análisis de Rentabilidad por Escenarios</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Escenario</th>
+                            <th>Precio Venta</th>
+                            <th>Margen</th>
+                            <th>Rentabilidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>🔴 BAJO</strong></td>
+                            <td>{{ '{:,.2f}'.format(analisis.venta_bajo).replace(',', 'X').replace('.', ',').replace('X', '.') if analisis.venta_bajo else '-' }} €</td>
+                            <td class="{{ 'text-success' if analisis.margen_bajo and analisis.margen_bajo > 0 else 'text-danger' }}">
+                                {{ '{:,.2f}'.format(analisis.margen_bajo).replace(',', 'X').replace('.', ',').replace('X', '.') if analisis.margen_bajo else '-' }} €
+                            </td>
+                            <td class="{{ 'text-success' if analisis.rentabilidad_bajo and analisis.rentabilidad_bajo > 0 else 'text-danger' }}">
+                                {{ '{:.2f}'.format(analisis.rentabilidad_bajo).replace('.', ',') if analisis.rentabilidad_bajo else '-' }} %
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>🟡 MEDIO</strong></td>
+                            <td>{{ '{:,.2f}'.format(analisis.venta_medio).replace(',', 'X').replace('.', ',').replace('X', '.') if analisis.venta_medio else '-' }} €</td>
+                            <td class="{{ 'text-success' if analisis.margen_medio and analisis.margen_medio > 0 else 'text-danger' }}">
+                                {{ '{:,.2f}'.format(analisis.margen_medio).replace(',', 'X').replace('.', ',').replace('X', '.') if analisis.margen_medio else '-' }} €
+                            </td>
+                            <td class="{{ 'text-success' if analisis.rentabilidad_medio and analisis.rentabilidad_medio > 0 else 'text-danger' }}">
+                                {{ '{:.2f}'.format(analisis.rentabilidad_medio).replace('.', ',') if analisis.rentabilidad_medio else '-' }} %
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>🟢 ALTO</strong></td>
+                            <td>{{ '{:,.2f}'.format(analisis.venta_alto).replace(',', 'X').replace('.', ',').replace('X', '.') if analisis.venta_alto else '-' }} €</td>
+                            <td class="{{ 'text-success' if analisis.margen_alto and analisis.margen_alto > 0 else 'text-danger' }}">
+                                {{ '{:,.2f}'.format(analisis.margen_alto).replace(',', 'X').replace('.', ',').replace('X', '.') if analisis.margen_alto else '-' }} €
+                            </td>
+                            <td class="{{ 'text-success' if analisis.rentabilidad_alto and analisis.rentabilidad_alto > 0 else 'text-danger' }}">
+                                {{ '{:.2f}'.format(analisis.rentabilidad_alto).replace('.', ',') if analisis.rentabilidad_alto else '-' }} %
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notas -->
+    {% if analisis.notas %}
+    <div class="card mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">📝 Notas</h5>
+        </div>
+        <div class="card-body">
+            <p class="mb-0" style="white-space: pre-wrap;">{{ analisis.notas }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Botones de acción -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                <i class="fas fa-arrow-left"></i> Volver al Dashboard
+            </a>
+            <a href="{{ url_for('lista_analisis') }}" class="btn btn-outline-primary">
+                <i class="fas fa-list"></i> Ver Todos los Análisis
+            </a>
+            <form method="POST" action="{{ url_for('eliminar_analisis', analisis_id=analisis.id) }}" style="display: inline;" 
+                  onsubmit="return confirm('¿Estás seguro de eliminar este análisis?');">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
