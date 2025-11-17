@@ -1,6 +1,2 @@
-# index.py
+# index.py - Punto de entrada para Vercel
 from api.app import app
-
-# Este archivo es el punto de entrada para Vercel
-# Exporta la aplicación Flask para que Vercel pueda ejecutarla
-app = app
