@@ -340,7 +340,6 @@ def eliminar_analisis(analisis_id):
     return redirect(url_for('lista_analisis'))
 
 # Ejecutar la aplicación
-if
 # Ejecutar la aplicación (solo para desarrollo local)
 if __name__ == '__main__':
     app.run(debug=True)
